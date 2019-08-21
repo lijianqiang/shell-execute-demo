@@ -35,7 +35,7 @@ public class ShellExecutorTest {
             File file = resource.getFile();
             ShellExecutor.execShell(file.getPath());
         } catch (IOException e) {
-            LOG.error("xxx", e);
+            LOG.error("testExecShell", e);
         }
         assertTrue("*testExecShell*", true);
     }
