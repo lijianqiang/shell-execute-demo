@@ -1,4 +1,4 @@
-package com.onemt.demo.execute.shell.exec;
+package com.bytehonor.demo.execute.shell.exec;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import com.onemt.demo.execute.shell.exec.ShellExecutor;
+import com.bytehonor.demo.execute.shell.exec.ShellExecutor;
 
 public class ShellExecutorTest {
 
