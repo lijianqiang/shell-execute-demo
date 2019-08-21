@@ -58,22 +58,33 @@ public class ShellExecutor {
 
     }
 
-    private static void printStream(InputStream inputStream) {
+    public static void printStream(InputStream inputStream) {
         if (inputStream == null) {
             LOG.error("input null");
             return;
         }
 
         String line = "";
-
-        try (BufferedReader input = new BufferedReader(new InputStreamReader(inputStream))) {
-            while ((line = input.readLine()) != null) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            while ((line = reader.readLine()) != null) {
                 LOG.info("line:{}", line);
             }
         } catch (IOException e1) {
             LOG.error("输出流失败", e1);
+        } finally {
+            close(reader);
         }
+    }
 
+    private static void close(BufferedReader reader) {
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
