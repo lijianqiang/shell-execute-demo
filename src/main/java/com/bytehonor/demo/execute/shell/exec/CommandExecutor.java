@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,19 @@ import org.slf4j.LoggerFactory;
 public class CommandExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandExecutor.class);
+
+    private static boolean IS_WINDOWS = false;
+
+    static {
+        Properties properties = System.getProperties();
+        // 获取键值
+//        Set<Object> keySet = properties.keySet();
+//        for (Object object : keySet) {
+//            System.out.println(object + ", " + properties.get(object));
+//        }
+        String os = (String) properties.get("os.name");
+        IS_WINDOWS = os.toLowerCase().contains("windows");
+    }
 
     public static Process execPython(String filePath) throws IOException {
         Objects.requireNonNull(filePath, "filePath");
@@ -44,10 +58,30 @@ public class CommandExecutor {
     public static Process execCommand(String cmd) throws IOException {
         Objects.requireNonNull(cmd, "cmd");
         if (LOG.isDebugEnabled()) {
-            LOG.debug("cmd:", cmd);
+            LOG.debug("cmd:{}", cmd);
         }
 
         return Runtime.getRuntime().exec(cmd);
+    }
+
+    public static void print(Process process) {
+        if (process == null) {
+            LOG.error("process null");
+            return;
+        }
+        if (IS_WINDOWS) {
+            LOG.info("--getInputStream--");
+            printStreamGBK(process.getInputStream());
+
+            LOG.info("--getErrorStream--");
+            printStreamGBK(process.getErrorStream());
+        } else {
+            LOG.info("--getInputStream--");
+            printStream(process.getInputStream());
+
+            LOG.info("--getErrorStream--");
+            printStream(process.getErrorStream());
+        }
     }
 
     public static void printStream(InputStream inputStream) {
