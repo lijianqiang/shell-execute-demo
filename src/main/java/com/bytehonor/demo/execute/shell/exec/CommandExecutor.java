@@ -5,11 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
+import com.bytehonor.demo.execute.shell.model.ExecResult;
 
 public class CommandExecutor {
 
@@ -64,24 +69,57 @@ public class CommandExecutor {
         return Runtime.getRuntime().exec(cmd);
     }
 
+    public static ExecResult toResult(Process process) {
+        ExecResult result = new ExecResult();
+        result.setInputStream(streamList(process.getInputStream()));
+        result.setErrorStream(streamList(process.getErrorStream()));
+        return result;
+    }
+
     public static void print(Process process) {
         if (process == null) {
             LOG.error("process null");
             return;
         }
-        if (IS_WINDOWS) {
+        ExecResult result = toResult(process);
+        if (CollectionUtils.isEmpty(result.getInputStream()) == false) {
             LOG.info("--getInputStream--");
-            printStreamGBK(process.getInputStream());
-
-            LOG.info("--getErrorStream--");
-            printStreamGBK(process.getErrorStream());
-        } else {
-            LOG.info("--getInputStream--");
-            printStream(process.getInputStream());
-
-            LOG.info("--getErrorStream--");
-            printStream(process.getErrorStream());
+            for (String stream : result.getInputStream()) {
+                LOG.info("line:{}", stream);
+            }
         }
+        if (CollectionUtils.isEmpty(result.getErrorStream()) == false) {
+            LOG.info("--getErrorStream--");
+            for (String stream : result.getErrorStream()) {
+                LOG.info("error:{}", stream);
+            }
+        }
+    }
+
+    public static List<String> streamList(InputStream inputStream) {
+        List<String> list = new ArrayList<String>();
+        if (inputStream == null) {
+            LOG.error("input null");
+            return list;
+        }
+
+        String line = "";
+        BufferedReader reader = null;
+        try {
+            if (IS_WINDOWS) {
+                reader = new BufferedReader(new InputStreamReader(inputStream, "GBK"));
+            } else {
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+            }
+            while ((line = reader.readLine()) != null) {
+                list.add(line);
+            }
+        } catch (IOException e1) {
+            LOG.error("输出流失败", e1);
+        } finally {
+            close(reader);
+        }
+        return list;
     }
 
     public static void printStream(InputStream inputStream) {

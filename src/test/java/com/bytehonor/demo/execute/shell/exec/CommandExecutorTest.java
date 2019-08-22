@@ -14,7 +14,7 @@ public class CommandExecutorTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandExecutorTest.class);
 
-    @Test
+//    @Test
     public void testExecPython() {
         ClassPathResource resource = new ClassPathResource("script/python-test.py");
         try {
@@ -39,11 +39,13 @@ public class CommandExecutorTest {
         assertTrue("*testExecShell*", true);
     }
 
-//    @Test
+    @Test
     public void testExecCommand() {
         try {
-            Process process = CommandExecutor.execCommand("cmd /c d: && dir");
+            String cmd = "netstat -a";// "cmd /c d: && dir";
+            Process process = CommandExecutor.execCommand(cmd);
             CommandExecutor.print(process);
+            process.destroy();
         } catch (IOException e) {
             LOG.error("testExecCommand", e);
         }
