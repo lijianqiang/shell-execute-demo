@@ -2,8 +2,8 @@ package com.bytehonor.demo.execute.shell.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,12 +25,45 @@ public class CommandController {
     private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Map<String, String> actionDefault(HttpServletRequest request) {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("/python", "?path=");
-        result.put("/shell", "?path=");
-        result.put("/cmd", "?cmd=");
+    public List<String> actionDefault(HttpServletRequest request) {
+        List<String> result = new ArrayList<String>();
+        result.add("/ansible?path=&yml=&param=");
+        result.add("/python?path=");
+        result.add("/shell?path=");
+        result.add("/cmd?cmd=");
         return result;
+    }
+
+    @RequestMapping(value = "/ansible", method = RequestMethod.GET)
+    public StringResultVO execAnsible(HttpServletRequest request) {
+        String path = request.getParameter("path");
+        String yml = request.getParameter("yml");
+        String param = request.getParameter("param");
+        if (StringUtils.isEmpty(path)) {
+            ClassPathResource resource = new ClassPathResource("script/python-test.py");
+            try {
+                File file = resource.getFile();
+                path = file.getPath();
+            } catch (IOException e) {
+                LOG.error("file", e);
+            }
+        }
+        LOG.info("execPython, path:{}", path);
+        try {
+            StringBuilder cmd = new StringBuilder();
+            cmd.append(path);
+            if (!StringUtils.isEmpty(yml)) {
+                cmd.append(" ").append(yml);
+            }
+            if (!StringUtils.isEmpty(param)) {
+                cmd.append(" ").append(param);
+            }
+            Process process = CommandExecutor.execPython(cmd.toString());
+            CommandExecutor.print(process);
+        } catch (IOException e) {
+            LOG.error("xxx", e);
+        }
+        return new StringResultVO();
     }
 
     @RequestMapping(value = "/python", method = RequestMethod.GET)
