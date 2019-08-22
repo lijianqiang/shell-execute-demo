@@ -29,14 +29,6 @@ public class LinuxShellExecutor {
 
     }
 
-    public static void execShell(String shellPath) throws IOException {
-        Objects.requireNonNull(shellPath, "filePath");
-        if (shellPath.endsWith(".sh") == false) {
-            throw new RuntimeException("not py file, " + shellPath);
-        }
-        execCommand(shellPath);
-    }
-
     public static void execShell(File file) throws IOException {
         Objects.requireNonNull(file, "file");
         if (file.exists() == false) {
