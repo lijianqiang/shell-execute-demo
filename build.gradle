@@ -25,6 +25,7 @@ ext {
 }
 
 dependencies {
+    implementation('com.bytehonor.sdk:common-protocol-sdk:3.4.5')
     implementation('com.bytehonor.sdk:spring-server-sdk:3.6.7')
     implementation('net.logstash.logback:logstash-logback-encoder:5.3')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
