@@ -10,10 +10,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ShellExecutor {
+public class WindowsCmdExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ShellExecutor.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(WindowsCmdExecutor.class);
+    
     public static void execPython(String filePath) throws IOException {
         Objects.requireNonNull(filePath, "filePath");
         if (filePath.endsWith(".py") == false) {
@@ -35,27 +35,16 @@ public class ShellExecutor {
 
     }
 
-    public static void execShell(String shell) throws IOException {
-        Objects.requireNonNull(shell, "filePath");
-        if (shell.endsWith(".sh") == false) {
-            throw new RuntimeException("not py file, " + shell);
-        }
-        File file = new File(shell);
-        if (file.exists() == false) {
-            throw new RuntimeException("not exist, " + shell);
-        }
-        if (file.canExecute() == false) {
-            throw new RuntimeException("canExecute = false, " + shell);
-        }
+    public static void execCmd(String cmd) throws IOException {
+        Objects.requireNonNull(cmd, "cmd");
 
-        Process process = Runtime.getRuntime().exec(file.getPath());
+        Process process = Runtime.getRuntime().exec(cmd);
 
         LOG.info("--getInputStream--");
         printStream(process.getInputStream());
 
         LOG.info("--getErrorStream--");
         printStream(process.getErrorStream());
-
     }
 
     public static void printStream(InputStream inputStream) {
@@ -65,8 +54,9 @@ public class ShellExecutor {
         }
 
         String line = "";
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader reader = null;
         try {
+            reader = new BufferedReader(new InputStreamReader(inputStream, "GBK"));
             while ((line = reader.readLine()) != null) {
                 LOG.info("line:{}", line);
             }
